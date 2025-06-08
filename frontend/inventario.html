@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventario y Ventas</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="header">
+        <h1>Sistema de Inventario y Ventas</h1>
+        <button id="logout-button">Cerrar Sesión</button>
+    </div>
+
+    <div class="container">
+        <h2>Agregar Producto</h2>
+        <form id="form-producto">
+            <input type="text" id="nombre-producto" placeholder="Nombre del producto" required>
+            <input type="number" id="cantidad-producto" placeholder="Cantidad" required>
+            <input type="number" step="0.01" id="precio-producto" placeholder="Precio" required>
+            <button type="submit">Agregar</button>
+        </form>
+
+        <h2>Inventario</h2>
+        <table id="tabla-inventario">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th>Precio</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                </tbody>
+        </table>
+    </div>
+
+    <script src="inventario.js"></script>
+</body>
+</html>

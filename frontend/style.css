@@ -1,0 +1,133 @@
+/* Estilos Generales */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    background-color: #f4f7f6;
+    color: #333;
+}
+
+.container {
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #333;
+    color: white;
+    padding: 10px 40px;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 1.5em;
+}
+
+/* Estilos para Formularios */
+form {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+}
+
+input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1em;
+}
+
+button {
+    padding: 10px 15px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.2s;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+#logout-button {
+    background-color: #dc3545;
+}
+
+#logout-button:hover {
+    background-color: #c82333;
+}
+
+/* Estilos para la Tabla de Inventario */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: left;
+}
+
+th {
+    background-color: #f2f2f2;
+    font-weight: 600;
+}
+
+/* Estilos Específicos para el Login */
+.login-container {
+    max-width: 400px;
+    margin: 100px auto;
+    padding: 40px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.login-container h1 {
+    margin-bottom: 30px;
+}
+
+.login-container form {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.form-group {
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.login-container button {
+    width: 100%;
+    margin-top: 10px;
+}
+
+.error-message {
+    color: #dc3545;
+    margin-top: 15px;
+    min-height: 20px;
+}
+
+.info {
+    font-size: 0.8em;
+    color: #6c757d;
+    margin-top: 20px;
+}
