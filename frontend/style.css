@@ -37,6 +37,13 @@ form {
     align-items: flex-end;
 }
 
+#form-producto {
+        flex-wrap: wrap; /* Permite que los elementos pasen a la siguiente línea */
+        align-items: flex-end;
+    }
+    .form-group-vertical { display: flex; flex-direction: column; gap: 5px; }
+    .form-group-vertical label { font-size: 0.8em; color: #555; }
+
 input {
     padding: 10px;
     border: 1px solid #ccc;

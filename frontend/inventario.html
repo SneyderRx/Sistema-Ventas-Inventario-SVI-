@@ -16,8 +16,15 @@
         <h2>Agregar Producto</h2>
         <form id="form-producto">
             <input type="text" id="nombre-producto" placeholder="Nombre del producto" required>
-            <input type="number" id="cantidad-producto" placeholder="Cantidad" required>
+            <input type="text" id="distribuidor-producto" placeholder="Distribuidor / Marca" required>
+            <input type="number" id="cantidad-producto" placeholder="Cantidad (Stock)" required>
             <input type="number" step="0.01" id="precio-producto" placeholder="Precio" required>
+
+            <div class="form-group-vertical">
+                <label for="arribo-producto">Fecha de Arribo</label>
+                <input type="date" id="arribo-producto" required>
+            </div>
+            
             <button type="submit">Agregar</button>
         </form>
 
@@ -29,6 +36,8 @@
                     <th>Cantidad</th>
                     <th>Precio</th>
                     <th>Acciones</th>
+                    <th>Editar</th>
+                    <th>Eliminar</th>
                 </tr>
             </thead>
             <tbody>
