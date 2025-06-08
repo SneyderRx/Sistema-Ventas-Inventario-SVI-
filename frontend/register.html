@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - Sistema de Inventario</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="login-container">
+        <h1>Crear una Cuenta</h1>
+        <form id="register-form">
+            
+            <div class="form-group">
+                <label for="Nombre">Nombre Completo</label>
+                <input type="text" id="Nombre" placeholder="Ej: Luz Flores" required>
+            </div>
+
+            <div class="form-group">
+                <label for="username">Nombre de Usuario</label>
+                <input type="text" id="username" placeholder="Ej: luzf" required>
+            </div>
+
+            <div class="form-group">
+                <label for="Email">Correo Electrónico</label>
+                <input type="email" id="Email" placeholder="ejemplo@correo.com" required>
+            </div>
+
+            <div class="form-group">
+                <label for="Celular">Celular</label>
+                <input type="tel" id="Celular" placeholder="Ej: 3152335489" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Contraseña</label>
+                <input type="password" id="password" placeholder="Crea una contraseña segura" required>
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword">Confirmar Contraseña</label>
+                <input type="password" id="confirmPassword" placeholder="Vuelve a escribir la contraseña" required>
+            </div>
+
+            <button type="submit">Registrarme</button>
+        </form>
+        <p id="error-message" class="error-message"></p>
+        <p class="info">¿Ya tienes una cuenta? <a href="login.html">Inicia sesión aquí</a></p>
+    </div>
+
+    <script src="register.js"></script>
+</body>
+</html>
