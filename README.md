@@ -16,6 +16,7 @@ Una aplicación web full-stack para la gestión de un inventario de productos y 
   - [Guía de Instalación](#guía-de-instalación)
   - [Scripts Disponibles](#scripts-disponibles)
   - [Estructura del Proyecto](#estructura-del-proyecto)
+  - [LICENSE](#license)
 
 ---
 
@@ -164,3 +165,6 @@ SVI/
     ├── reportes.js
     └── style.css
 ```
+
+## LICENSE
+  - Este proyecto está bajo la MIT License.
