@@ -133,6 +133,7 @@ formProducto.addEventListener('submit', async function(e) {
 
     // Delegación de eventos para Editar y Eliminar
     tablaInventario.addEventListener('click', async (e) => {
+        const target = e.target;
         const id = e.target.dataset.id;
         if (e.target.classList.contains('delete-btn')) {
             Swal.fire({
