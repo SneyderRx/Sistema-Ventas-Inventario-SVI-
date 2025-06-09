@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- REFERENCIAS A ELEMENTOS DEL DOM ---
     const formProducto = document.getElementById('form-producto');
+    const buscadorInventario = document.getElementById('buscador-inventario');
     const tablaInventario = document.getElementById('tabla-inventario').getElementsByTagName('tbody')[0];
     const logoutButton = document.getElementById('logout-button');
     // Modal de Venta
@@ -296,6 +297,21 @@ formProducto.addEventListener('submit', async function(e) {
     if (e.target == modalVenta) {
         modalVenta.style.display = 'none';
     }
+});
+
+// --- LÓGICA DEL BUSCADOR DE INVENTARIO ---
+buscadorInventario.addEventListener('keyup', () => {
+    // 1. Obtenemos el texto que el usuario ha escrito, en minúsculas para no distinguir may/min.
+    const terminoBusqueda = buscadorInventario.value.toLowerCase();
+
+    // 2. Filtramos el array principal de productos.
+    //    Nos quedamos solo con los productos cuyo nombre (también en minúsculas) incluya el término de búsqueda.
+    const productosFiltrados = inventarioCompleto.filter(producto => {
+        return producto.Nombre.toLowerCase().includes(terminoBusqueda);
+    });
+
+    // 3. Volvemos a dibujar la tabla, pero esta vez solo con los productos filtrados.
+    renderizarInventario(productosFiltrados);
 });
 
     // --- INICIALIZACIÓN ---

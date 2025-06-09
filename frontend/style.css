@@ -142,6 +142,19 @@ button:hover {
 }
 
 /* Estilos para la Tabla de Inventario */
+.search-container {
+    margin-bottom: 15px;
+}
+
+#buscador-inventario {
+    width: 100%;
+    padding: 10px;
+    font-size: 1em;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box; /* Asegura que el padding no afecte el ancho total */
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
