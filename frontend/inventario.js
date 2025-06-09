@@ -134,28 +134,72 @@ formProducto.addEventListener('submit', async function(e) {
     tablaInventario.addEventListener('click', async (e) => {
         const id = e.target.dataset.id;
         if (e.target.classList.contains('delete-btn')) {
-            if (confirm('¿Estás seguro de que deseas eliminar este producto?')) {
-                await fetch(`${apiUrl}/productos/${id}`, { method: 'DELETE', headers });
-                obtenerInventario();
-            }
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: "¡No podrás revertir esta acción!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, ¡elimínalo!',
+                cancelButtonText: 'Cancelar'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    // Si el usuario confirma, ejecutamos la lógica de eliminación
+                    try {
+                        await fetch(`${apiUrl}/productos/${id}`, { method: 'DELETE', headers });
+                        Swal.fire(
+                            '¡Eliminado!',
+                            'El producto ha sido eliminado.',
+                            'success'
+                        );
+                        await obtenerInventario();
+                    } catch(error) {
+                        Swal.fire('Error', 'No se pudo eliminar el producto.', 'error');
+                    }
+                }
+            });
         }
 
-        if (e.target.classList.contains('edit-btn')) {
-            const fila = e.target.closest('tr');
-            const productoActualizado = {
-                Nombre: prompt("Nuevo nombre:", fila.dataset.nombre),
-                Precio: parseFloat(prompt("Nuevo precio:", fila.dataset.precio)),
-                Stock: parseInt(prompt("Nuevo stock:", fila.dataset.stock))
-            };
+        if (target.classList.contains('edit-btn')) {
+            const fila = target.closest('tr');
+            const nombreActual = fila.dataset.nombre;
+            const precioActual = fila.dataset.precio;
+            const stockActual = fila.dataset.stock;
 
-            if (productoActualizado.Nombre && !isNaN(productoActualizado.Precio) && !isNaN(productoActualizado.Stock)) {
-                await fetch(`${apiUrl}/productos/${id}`, {
-                    method: 'PUT',
-                    headers,
-                    body: JSON.stringify(productoActualizado)
-                });
-                obtenerInventario();
-            }
+            Swal.fire({
+                title: 'Editar Producto',
+                html: `
+                    <input id="swal-nombre" class="swal2-input" value="${nombreActual}" placeholder="Nombre del producto">
+                    <input id="swal-precio" type="number" class="swal2-input" value="${precioActual}" placeholder="Precio">
+                    <input id="swal-stock" type="number" class="swal2-input" value="${stockActual}" placeholder="Stock">
+                `,
+                focusConfirm: false,
+                preConfirm: () => {
+                    return {
+                        Nombre: document.getElementById('swal-nombre').value,
+                        Precio: parseFloat(document.getElementById('swal-precio').value),
+                        Stock: parseInt(document.getElementById('swal-stock').value)
+                    }
+                }
+            }).then(async (result) => {
+                if (result.isConfirmed && result.value) {
+                    const productoActualizado = result.value;
+                    if (productoActualizado.Nombre && !isNaN(productoActualizado.Precio) && !isNaN(productoActualizado.Stock)) {
+                        try {
+                            await fetch(`${apiUrl}/productos/${id}`, {
+                                method: 'PUT',
+                                headers,
+                                body: JSON.stringify(productoActualizado)
+                            });
+                            Swal.fire('¡Actualizado!', 'El producto ha sido actualizado.', 'success');
+                            await obtenerInventario();
+                        } catch(error) {
+                            Swal.fire('Error', 'No se pudo actualizar el producto.', 'error');
+                        }
+                    }
+                }
+            });
         }
     });
 
@@ -187,7 +231,13 @@ formProducto.addEventListener('submit', async function(e) {
             const response = await fetch(`${apiUrl}/ventas`, { method: 'POST', headers, body: JSON.stringify(payload) });
             const data = await response.json();
             if (!response.ok) throw new Error(data.message);
-            alert('¡Venta registrada con éxito!');
+            Swal.fire({
+                title: '¡Venta Registrada!',
+                text: 'La venta se ha registrado con éxito.',
+                icon: 'success',
+                timer: 2000, // La alerta se cierra sola después de 2 segundos
+                showConfirmButton: false
+            });
             modalVenta.style.display = 'none';
             await obtenerInventario();
         } catch (error) {
