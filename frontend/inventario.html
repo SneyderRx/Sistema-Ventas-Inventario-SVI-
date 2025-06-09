@@ -45,6 +45,28 @@
         </table>
     </div>
 
+    <div id="modal-nuevo-cliente" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2>Registrar Nuevo Cliente</h2>
+            <form id="form-nuevo-cliente">
+                <div class="form-group">
+                    <label for="modal-nombre-cliente">Nombre Completo</label>
+                    <input type="text" id="modal-nombre-cliente" required>
+                </div>
+                <div class="form-group">
+                    <label for="modal-celular-cliente">Celular</label>
+                    <input type="tel" id="modal-celular-cliente" required>
+                </div>
+                <div class="form-group">
+                    <label for="modal-email-cliente">Correo Electrónico</label>
+                    <input type="email" id="modal-email-cliente" required>
+                </div>
+                <button type="submit">Guardar Cliente</button>
+                <p id="modal-error-message" class="error-message"></p>
+            </form>
+        </div>
+    </div>
     </div> <div id="modal-venta" class="modal">
         <div class="modal-content">
             <span class="close-btn">&times;</span>
@@ -55,17 +77,17 @@
                     <label for="modal-cantidad-venta">Cantidad a Vender:</label>
                     <input type="number" id="modal-cantidad-venta" min="1" value="1" required>
                 </div>
-                <div class="form-group">
-                    <label for="modal-cliente-select">Cliente:</label>
+                <div class="form-group venta-controles"> <label for="modal-cliente-select">Cliente:</label>
                     <select id="modal-cliente-select" required>
                         <option value="">Cargando clientes...</option>
                     </select>
+                    <button type="button" id="btn-abrir-modal-cliente" class="btn-plus">+</button>
                 </div>
                 <button type="submit">Confirmar Venta</button>
             </form>
         </div>
     </div>
-    
+
     <script src="inventario.js"></script>
 </body>
 </html>

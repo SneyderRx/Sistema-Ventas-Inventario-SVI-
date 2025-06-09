@@ -90,6 +90,29 @@ app.get('/api/clientes', authenticateToken, async (req, res) => {
     }
 });
 
+// --- RUTA PARA CREAR (REGISTRAR) UN NUEVO CLIENTE (POST) ---
+app.post('/api/clientes', authenticateToken, async (req, res) => {
+    try {
+        const { Nombre_cliente, Celular_cliente, Email_cliente } = req.body;
+        if (!Nombre_cliente || !Celular_cliente || !Email_cliente) {
+            return res.status(400).json({ message: 'Nombre, Celular y Email del cliente son requeridos.' });
+        }
+        const sql = 'INSERT INTO cliente (Nombre_cliente, Celular_cliente, Email_cliente) VALUES (?, ?, ?)';
+        const [result] = await pool.query(sql, [Nombre_cliente, Celular_cliente, Email_cliente]);
+        
+        // Devolvemos el cliente recién creado con su nuevo ID
+        res.status(201).json({
+            id_cliente: result.insertId,
+            Nombre_cliente,
+            Celular_cliente,
+            Email_cliente
+        });
+    } catch (error) {
+        console.error("Error al registrar cliente:", error);
+        res.status(500).json({ message: 'Error en el servidor.' });
+    }
+});
+
 
 // --- RUTAS DE LA API PARA PRODUCTOS (CRUD) ---
 

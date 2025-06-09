@@ -10,12 +10,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const formProducto = document.getElementById('form-producto');
     const tablaInventario = document.getElementById('tabla-inventario').getElementsByTagName('tbody')[0];
     const logoutButton = document.getElementById('logout-button');
-    // Elementos de la nueva Modal de Venta
+    // Modal de Venta
     const modalVenta = document.getElementById('modal-venta');
     const modalProductoNombre = document.getElementById('modal-producto-nombre');
     const modalClienteSelect = document.getElementById('modal-cliente-select');
     const formVenta = document.getElementById('form-venta');
-    const closeModalBtn = modalVenta.querySelector('.close-btn');
+    const closeVentaBtn = modalVenta.querySelector('.close-btn');
+    // Modal de Cliente
+    const btnAbrirModalCliente = document.getElementById('btn-abrir-modal-cliente');
+    const modalNuevoCliente = document.getElementById('modal-nuevo-cliente');
+    const formNuevoCliente = document.getElementById('form-nuevo-cliente');
+    const closeClienteBtn = modalNuevoCliente.querySelector('.close-btn');
+    const modalErrorMessage = document.getElementById('modal-error-message');
     
     // --- URLs y HEADERS ---
     const apiUrl = 'http://localhost:3000/api';
@@ -29,8 +35,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Función principal que se ejecuta al cargar la página
     async function inicializarPagina() {
-        await obtenerInventario();
-        await obtenerClientes();
+        await Promise.all([obtenerInventario(), obtenerClientes()]);
     }
 
     async function obtenerInventario() {
@@ -42,25 +47,6 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (error) {
             console.error('Error:', error);
             alert('No se pudo cargar el inventario.');
-        }
-    }
-
-    async function obtenerClientes() {
-        try {
-            const response = await fetch(`${apiUrl}/clientes`, { headers });
-            if (!response.ok) throw new Error('Error al cargar clientes');
-            const clientes = await response.json();
-            
-            modalClienteSelect.innerHTML = '<option value="">Seleccione un cliente...</option>';
-            clientes.forEach(cliente => {
-                const option = document.createElement('option');
-                option.value = cliente.id_cliente;
-                option.textContent = cliente.Nombre_cliente;
-                modalClienteSelect.appendChild(option);
-            });
-        } catch (error) {
-            console.error('Error:', error);
-            modalClienteSelect.innerHTML = '<option value="">Error al cargar clientes</option>';
         }
     }
 
@@ -83,67 +69,31 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // --- LÓGICA DE LA MODAL DE VENTA ---
-
-    // Hacemos la función global para que el `onclick` del HTML la encuentre
-    window.abrirModalVenta = (idProducto) => {
-        const producto = inventarioCompleto.find(p => p.id_producto === idProducto);
-        if (!producto) return;
-
-        // Guardamos el ID del producto en el formulario para usarlo después
-        formVenta.dataset.idProducto = idProducto;
-        
-        modalProductoNombre.textContent = producto.Nombre;
-        document.getElementById('modal-cantidad-venta').max = producto.Stock; // Limitar cantidad al stock
-        modalVenta.style.display = 'block';
-    };
-
-    // Evento para cerrar la modal
-    closeModalBtn.addEventListener('click', () => {
-        modalVenta.style.display = 'none';
-    });
-    window.addEventListener('click', (e) => {
-        if (e.target == modalVenta) {
-            modalVenta.style.display = 'none';
-        }
-    });
-
-    // Evento para procesar el formulario de la venta
-    formVenta.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        const id_producto = parseInt(formVenta.dataset.idProducto);
-        const cantidad = parseInt(document.getElementById('modal-cantidad-venta').value);
-        const id_cliente = parseInt(modalClienteSelect.value);
-
-        if (!id_cliente) {
-            alert('Por favor, seleccione un cliente.');
-            return;
-        }
-
-        const payload = {
-            id_cliente,
-            productos: [{ id_producto, cantidad }]
-        };
-
+    async function obtenerClientes() {
         try {
-            const response = await fetch(`${apiUrl}/ventas`, {
-                method: 'POST',
-                headers,
-                body: JSON.stringify(payload)
-            });
-            const data = await response.json();
-            if (!response.ok) throw new Error(data.message);
-
-            alert('¡Venta registrada con éxito!');
-            modalVenta.style.display = 'none'; // Cerramos la modal
-            await obtenerInventario(); // Refrescamos la tabla para ver el stock actualizado
-
+            const response = await fetch(`${apiUrl}/clientes`, { headers });
+            if (!response.ok) throw new Error('Error al cargar clientes');
+            const clientes = await response.json();
+            renderizarClientes(clientes);
         } catch (error) {
-            console.error('Error al registrar venta:', error);
-            alert(`Error: ${error.message}`);
+            console.error('Error:', error);
+            modalClienteSelect.innerHTML = '<option value="">Error al cargar</option>';
         }
-    });
+    }
+
+    function renderizarClientes(clientes, nuevoClienteId = null) {
+        modalClienteSelect.innerHTML = '<option value="">Seleccione un cliente...</option>';
+        clientes.forEach(cliente => {
+            const option = document.createElement('option');
+            option.value = cliente.id_cliente;
+            option.textContent = cliente.Nombre_cliente;
+            modalClienteSelect.appendChild(option);
+        });
+        if (nuevoClienteId) {
+            modalClienteSelect.value = nuevoClienteId;
+        }
+    }
+
 
     // Lógica para el formulario de "Agregar Producto"
 formProducto.addEventListener('submit', async function(e) {
@@ -159,7 +109,7 @@ formProducto.addEventListener('submit', async function(e) {
     };
 
     try {
-        const response = await fetch(apiUrl, {
+        const response = await fetch(`${apiUrl}/productos`, {
             method: 'POST',
             headers: headers,
             body: JSON.stringify(nuevoProducto)
@@ -185,7 +135,7 @@ formProducto.addEventListener('submit', async function(e) {
         const id = e.target.dataset.id;
         if (e.target.classList.contains('delete-btn')) {
             if (confirm('¿Estás seguro de que deseas eliminar este producto?')) {
-                await fetch(`${apiUrl}/${id}`, { method: 'DELETE', headers });
+                await fetch(`${apiUrl}/productos/${id}`, { method: 'DELETE', headers });
                 obtenerInventario();
             }
         }
@@ -199,7 +149,7 @@ formProducto.addEventListener('submit', async function(e) {
             };
 
             if (productoActualizado.Nombre && !isNaN(productoActualizado.Precio) && !isNaN(productoActualizado.Stock)) {
-                await fetch(`${apiUrl}/${id}`, {
+                await fetch(`${apiUrl}/productos/${id}`, {
                     method: 'PUT',
                     headers,
                     body: JSON.stringify(productoActualizado)
@@ -208,11 +158,95 @@ formProducto.addEventListener('submit', async function(e) {
             }
         }
     });
+
+
+    // --- LÓGICA DE VENTA ---
+    window.abrirModalVenta = (idProducto) => {
+        const producto = inventarioCompleto.find(p => p.id_producto === idProducto);
+        if (!producto) return;
+        formVenta.dataset.idProducto = idProducto;
+        modalProductoNombre.textContent = producto.Nombre;
+        document.getElementById('modal-cantidad-venta').max = producto.Stock;
+        modalVenta.style.display = 'block';
+    };
+
+    closeVentaBtn.addEventListener('click', () => { modalVenta.style.display = 'none'; });
+
+    formVenta.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id_producto = parseInt(formVenta.dataset.idProducto);
+        const cantidad = parseInt(document.getElementById('modal-cantidad-venta').value);
+        const id_cliente = parseInt(modalClienteSelect.value);
+
+        if (!id_cliente) {
+            alert('Por favor, seleccione un cliente.');
+            return;
+        }
+        const payload = { id_cliente, productos: [{ id_producto, cantidad }] };
+        try {
+            const response = await fetch(`${apiUrl}/ventas`, { method: 'POST', headers, body: JSON.stringify(payload) });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.message);
+            alert('¡Venta registrada con éxito!');
+            modalVenta.style.display = 'none';
+            await obtenerInventario();
+        } catch (error) {
+            console.error('Error al registrar venta:', error);
+            alert(`Error: ${error.message}`);
+        }
+    });
+
+    // --- LÓGICA DE LA MODAL DE CLIENTE NUEVO ---
+    btnAbrirModalCliente.addEventListener('click', () => {
+        modalNuevoCliente.style.display = 'block';
+    });
+
+    closeClienteBtn.addEventListener('click', () => {
+        modalNuevoCliente.style.display = 'none';
+    });
+
+    formNuevoCliente.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        modalErrorMessage.textContent = '';
+        const nuevoCliente = {
+            Nombre_cliente: document.getElementById('modal-nombre-cliente').value,
+            Celular_cliente: document.getElementById('modal-celular-cliente').value,
+            Email_cliente: document.getElementById('modal-email-cliente').value,
+        };
+        try {
+            const response = await fetch(`${apiUrl}/clientes`, { method: 'POST', headers, body: JSON.stringify(nuevoCliente) });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.message);
+            
+            alert('Cliente registrado con éxito.');
+            modalNuevoCliente.style.display = 'none';
+            formNuevoCliente.reset();
+            
+            // Refrescamos la lista de clientes y seleccionamos el nuevo
+            await obtenerClientes();
+            modalClienteSelect.value = data.id_cliente;
+        } catch (error) {
+            modalErrorMessage.textContent = error.message;
+        }
+    });
     
     logoutButton.addEventListener('click', () => {
         localStorage.removeItem('token');
         window.location.href = 'login.html';
     });
+
+        // Cerrar modales si se hace clic afuera
+    window.addEventListener('click', (e) => {
+    // Si la modal de cliente está abierta y el clic es en su fondo, la cerramos.
+    if (e.target == modalNuevoCliente) {
+        modalNuevoCliente.style.display = 'none';
+        return; // Detenemos para no evaluar la otra condición
+    }
+    // Si la modal de venta está abierta y el clic es en su fondo, la cerramos.
+    if (e.target == modalVenta) {
+        modalVenta.style.display = 'none';
+    }
+});
 
     // --- INICIALIZACIÓN ---
     inicializarPagina();

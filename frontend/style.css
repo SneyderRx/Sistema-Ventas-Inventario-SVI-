@@ -29,30 +29,59 @@ body {
     font-size: 1.5em;
 }
 
-/* Estilos para la ventana modal */
+
+/* Estilos para el botón '+' */
+.btn-plus {
+    padding: 0;
+    width: 38px;
+    height: 38px;
+    font-size: 1.5em;
+    line-height: 38px;
+    flex-shrink: 0;
+}
+
+/* Estilos para TODAS las ventanas modales */
 .modal {
-    display: none; /* Oculta por defecto */
+    display: none; 
     position: fixed;
-    z-index: 1000;
+    z-index: 1000; /* <--- Le damos una base de apilamiento */
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: rgba(0,0,0,0.5); /* Fondo semitransparente */
+    background-color: rgba(0,0,0,0.5); 
 }
 
+/* Estilos para el CONTENIDO de las modales */
 .modal-content {
     background-color: #fefefe;
-    margin: 15% auto;
-    padding: 20px;
+    margin: 10% auto; /* Centrado vertical un poco más arriba */
+    padding: 25px;
     border: 1px solid #888;
-    width: 80%;
-    max-width: 500px;
+    width: 90%;
     border-radius: 8px;
     position: relative;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
 }
 
+/* ---- ¡NUEVAS REGLAS PARA TAMAÑO Y APILAMIENTO! ---- */
+
+/* Tamaño específico para la modal de Venta */
+#modal-venta .modal-content {
+    max-width: 450px;
+}
+
+/* Tamaño específico y z-index MAYOR para la modal de Cliente */
+#modal-nuevo-cliente {
+    z-index: 1100; /* <--- ¡LA CLAVE! Un número más alto la pone encima */
+}
+#modal-nuevo-cliente .modal-content {
+    max-width: 72vw;
+}
+
+
+/* Estilos para el botón de cerrar (sin cambios) */
 .close-btn {
     color: #aaa;
     float: right;
@@ -72,7 +101,7 @@ form {
     margin-bottom: 20px;
     display: flex;
     gap: 10px;
-    align-items: flex-end;
+    align-items: center;
 }
 
 #form-producto {
@@ -146,7 +175,7 @@ th {
 
 .login-container form {
     flex-direction: column;
-    align-items: stretch;
+    /* align-items: stretch; */
 }
 
 .form-group {
@@ -161,7 +190,7 @@ th {
 }
 
 .login-container button {
-    width: 100%;
+    width: 238px;
     margin-top: 10px;
 }
 
