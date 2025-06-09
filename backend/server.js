@@ -220,6 +220,58 @@ app.post('/api/ventas', authenticateToken, async (req, res) => {
     }
 });
 
+// --- RUTA PARA OBTENER EL HISTORIAL DE VENTAS (Maestro) ---
+app.get('/api/ventas', authenticateToken, async (req, res) => {
+    try {
+        // Esta consulta SQL es más avanzada. Usamos JOIN para unir 4 tablas
+        // y SUM y GROUP BY para calcular el total de cada venta.
+        const sql = `
+            SELECT 
+                v.id_venta,
+                v.Fecha_venta,
+                c.Nombre_cliente,
+                u.Nombre AS Nombre_vendedor,
+                SUM(dv.Cantidad * dv.Precio_unitario) AS Total_venta
+            FROM ventas v
+            JOIN cliente c ON v.id_cliente = c.id_cliente
+            JOIN usuario u ON v.id_usuario = u.id_usuario
+            JOIN detalle_venta dv ON v.id_venta = dv.id_venta
+            GROUP BY v.id_venta
+            ORDER BY v.Fecha_venta DESC;
+        `;
+        const [ventas] = await pool.query(sql);
+        res.json(ventas);
+    } catch (error) {
+        console.error("Error al obtener historial de ventas:", error);
+        res.status(500).json({ message: 'Error en el servidor.' });
+    }
+});
+
+// --- RUTA PARA OBTENER EL DETALLE DE UNA VENTA ESPECÍFICA ---
+app.get('/api/ventas/:id', authenticateToken, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const sql = `
+            SELECT 
+                p.Nombre,
+                dv.Cantidad,
+                dv.Precio_unitario
+            FROM detalle_venta dv
+            JOIN productos p ON dv.id_producto = p.id_producto
+            WHERE dv.id_venta = ?;
+        `;
+        const [detalles] = await pool.query(sql, [id]);
+        
+        if (detalles.length === 0) {
+            return res.status(404).json({ message: 'No se encontraron detalles para esta venta.' });
+        }
+        res.json(detalles);
+    } catch (error) {
+        console.error("Error al obtener detalle de venta:", error);
+        res.status(500).json({ message: 'Error en el servidor.' });
+    }
+});
+
 
 // --- INICIO DEL SERVIDOR ---
 app.listen(PORT, () => {

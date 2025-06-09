@@ -29,6 +29,41 @@ body {
     font-size: 1.5em;
 }
 
+.nav-link {
+    color: white;
+    text-decoration: none;
+    margin-right: 20px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+.nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Estilos para las tarjetas de venta en la página de reportes */
+.venta-card {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+.venta-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+}
+.venta-header strong { font-size: 1.2em; }
+.venta-header span { color: #666; margin-left: 15px; }
+.venta-body p { margin: 5px 0; }
+.venta-total { font-size: 1.2em; text-align: right; }
+.venta-detalle-container ul { padding-left: 20px; margin-top: 15px; }
+
 
 /* Estilos para el botón '+' */
 .btn-plus {
