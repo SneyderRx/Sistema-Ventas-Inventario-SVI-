@@ -1,5 +1,7 @@
-# Ignorar dependencias de Node
-backend/node_modules/
-
-# Ignorar archivo de variables de entorno
+# Backend
+backend/node_modules
 backend/.env
+
+# Archivos de log y de sistema operativo
+npm-debug.log*
+.DS_Store
