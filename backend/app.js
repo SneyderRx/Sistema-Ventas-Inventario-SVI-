@@ -272,8 +272,4 @@ app.get('/api/ventas/:id', authenticateToken, async (req, res) => {
     }
 });
 
-
-// --- INICIO DEL SERVIDOR ---
-app.listen(PORT, () => {
-    console.log(`Servidor corriendo en http://localhost:${PORT}`);
-});
+module.exports = { app, pool };
