@@ -79,6 +79,17 @@ app.post('/api/auth/login', async (req, res) => {
     }
 });
 
+// --- RUTA PARA OBTENER TODOS LOS CLIENTES (GET) ---
+app.get('/api/clientes', authenticateToken, async (req, res) => {
+    try {
+        const [rows] = await pool.query('SELECT id_cliente, Nombre_cliente FROM cliente ORDER BY Nombre_cliente ASC');
+        res.json(rows);
+    } catch (error) {
+        console.error("Error al obtener clientes:", error);
+        res.status(500).json({ message: 'Error en el servidor.' });
+    }
+});
+
 
 // --- RUTAS DE LA API PARA PRODUCTOS (CRUD) ---
 

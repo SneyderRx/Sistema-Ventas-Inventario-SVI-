@@ -1,39 +1,69 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // --- ESTADO INICIAL Y VALIDACIÓN ---
     const token = localStorage.getItem('token');
-    
     if (!token) {
         window.location.href = 'login.html';
         return;
     }
 
+    // --- REFERENCIAS A ELEMENTOS DEL DOM ---
     const formProducto = document.getElementById('form-producto');
     const tablaInventario = document.getElementById('tabla-inventario').getElementsByTagName('tbody')[0];
     const logoutButton = document.getElementById('logout-button');
+    // Elementos de la nueva Modal de Venta
+    const modalVenta = document.getElementById('modal-venta');
+    const modalProductoNombre = document.getElementById('modal-producto-nombre');
+    const modalClienteSelect = document.getElementById('modal-cliente-select');
+    const formVenta = document.getElementById('form-venta');
+    const closeModalBtn = modalVenta.querySelector('.close-btn');
     
-    // --- CORRECCIÓN #1: URL de la API ---
-    const apiUrl = 'http://localhost:3000/api/productos';
-
+    // --- URLs y HEADERS ---
+    const apiUrl = 'http://localhost:3000/api';
     const headers = {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
     };
+    let inventarioCompleto = [];
+
+    // --- FUNCIONES DE CARGA Y RENDERIZADO ---
+    
+    // Función principal que se ejecuta al cargar la página
+    async function inicializarPagina() {
+        await obtenerInventario();
+        await obtenerClientes();
+    }
 
     async function obtenerInventario() {
         try {
-            const response = await fetch(apiUrl, { headers });
-            if (response.status === 403 || response.status === 401) {
-                localStorage.removeItem('token');
-                window.location.href = 'login.html';
-                return;
-            }
-            const inventario = await response.json();
-            renderizarInventario(inventario);
+            const response = await fetch(`${apiUrl}/productos`, { headers });
+            if (!response.ok) throw new Error('Error al cargar inventario');
+            inventarioCompleto = await response.json();
+            renderizarInventario(inventarioCompleto);
         } catch (error) {
-            console.error('Error al obtener inventario:', error);
+            console.error('Error:', error);
+            alert('No se pudo cargar el inventario.');
         }
     }
 
-    // --- CORRECCIÓN #2: Estructura de la tabla ---
+    async function obtenerClientes() {
+        try {
+            const response = await fetch(`${apiUrl}/clientes`, { headers });
+            if (!response.ok) throw new Error('Error al cargar clientes');
+            const clientes = await response.json();
+            
+            modalClienteSelect.innerHTML = '<option value="">Seleccione un cliente...</option>';
+            clientes.forEach(cliente => {
+                const option = document.createElement('option');
+                option.value = cliente.id_cliente;
+                option.textContent = cliente.Nombre_cliente;
+                modalClienteSelect.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Error:', error);
+            modalClienteSelect.innerHTML = '<option value="">Error al cargar clientes</option>';
+        }
+    }
+
     function renderizarInventario(inventario) {
         tablaInventario.innerHTML = '';
         inventario.forEach(producto => {
@@ -46,12 +76,74 @@ document.addEventListener('DOMContentLoaded', function() {
                 <td>${producto.Nombre}</td>
                 <td>${producto.Stock}</td>
                 <td>$${parseFloat(producto.Precio).toFixed(2)}</td>
-                <td><button onclick="venderProducto(${producto.id_producto})">Vender</button></td>
+                <td><button onclick="window.abrirModalVenta(${producto.id_producto})">Vender</button></td>
                 <td><button class="edit-btn" data-id="${producto.id_producto}">Editar</button></td>
                 <td><button class="delete-btn" data-id="${producto.id_producto}">Eliminar</button></td>
             `;
         });
     }
+
+    // --- LÓGICA DE LA MODAL DE VENTA ---
+
+    // Hacemos la función global para que el `onclick` del HTML la encuentre
+    window.abrirModalVenta = (idProducto) => {
+        const producto = inventarioCompleto.find(p => p.id_producto === idProducto);
+        if (!producto) return;
+
+        // Guardamos el ID del producto en el formulario para usarlo después
+        formVenta.dataset.idProducto = idProducto;
+        
+        modalProductoNombre.textContent = producto.Nombre;
+        document.getElementById('modal-cantidad-venta').max = producto.Stock; // Limitar cantidad al stock
+        modalVenta.style.display = 'block';
+    };
+
+    // Evento para cerrar la modal
+    closeModalBtn.addEventListener('click', () => {
+        modalVenta.style.display = 'none';
+    });
+    window.addEventListener('click', (e) => {
+        if (e.target == modalVenta) {
+            modalVenta.style.display = 'none';
+        }
+    });
+
+    // Evento para procesar el formulario de la venta
+    formVenta.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const id_producto = parseInt(formVenta.dataset.idProducto);
+        const cantidad = parseInt(document.getElementById('modal-cantidad-venta').value);
+        const id_cliente = parseInt(modalClienteSelect.value);
+
+        if (!id_cliente) {
+            alert('Por favor, seleccione un cliente.');
+            return;
+        }
+
+        const payload = {
+            id_cliente,
+            productos: [{ id_producto, cantidad }]
+        };
+
+        try {
+            const response = await fetch(`${apiUrl}/ventas`, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify(payload)
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.message);
+
+            alert('¡Venta registrada con éxito!');
+            modalVenta.style.display = 'none'; // Cerramos la modal
+            await obtenerInventario(); // Refrescamos la tabla para ver el stock actualizado
+
+        } catch (error) {
+            console.error('Error al registrar venta:', error);
+            alert(`Error: ${error.message}`);
+        }
+    });
 
     // Lógica para el formulario de "Agregar Producto"
 formProducto.addEventListener('submit', async function(e) {
@@ -116,17 +208,12 @@ formProducto.addEventListener('submit', async function(e) {
             }
         }
     });
-
-    // La función para vender sigue siendo un desafío, porque nuestro backend ahora espera una transacción compleja.
-    // La dejaremos pendiente por ahora para enfocarnos en el CRUD de productos.
-    window.venderProducto = function(id) {
-        alert(`La función 'Vender' debe ser rediseñada para usar la nueva API de ventas. ¡Este será nuestro próximo paso! ID del producto: ${id}`);
-    };
     
     logoutButton.addEventListener('click', () => {
         localStorage.removeItem('token');
         window.location.href = 'login.html';
     });
 
-    obtenerInventario();
+    // --- INICIALIZACIÓN ---
+    inicializarPagina();
 });
